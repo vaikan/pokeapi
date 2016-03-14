@@ -20,8 +20,9 @@ import csv
 import os
 import os.path
 import re
-from django.db import migrations, connection
-from pokemon_v2.models import *
+import json
+from django.db import connection
+from pokemon_v2.models import *  # NOQA
 
 
 # why this way? how about use `__file__`
@@ -32,6 +33,20 @@ SUB_RGX = r"\[.*?\]\{.*?\}"
 
 db_cursor = connection.cursor()
 DB_VENDOR = connection.vendor
+
+
+imageDir = os.getcwd() + '/data/v2/sprites/'
+resourceImages = []
+for root, dirs, files in os.walk(imageDir):
+    for file in files:
+        resourceImages.append(os.path.join(root.replace(imageDir, ""), file))
+
+
+mediaDir = '/media/sprites/{0}'
+
+
+def filePathOrNone(fileName):
+    return mediaDir.format(fileName) if fileName in resourceImages else None
 
 
 def with_iter(context, iterable=None):
@@ -53,14 +68,15 @@ def clear_table(model):
     print('building ' + table_name)
     # Reset DB auto increments to start at 1
     if DB_VENDOR == 'sqlite':
-        db_cursor.execute("DELETE FROM sqlite_sequence WHERE name = " + "'" + table_name + "'" )
+        db_cursor.execute("DELETE FROM sqlite_sequence WHERE name = " + "'" + table_name + "'")
     else:
-        db_cursor.execute("SELECT setval(pg_get_serial_sequence(" + "'" + table_name + "'" + ",'id'), 1, false);")
+        db_cursor.execute(
+            "SELECT setval(pg_get_serial_sequence(" + "'" + table_name + "'" + ",'id'), 1, false);")
 
 
 def process_csv(file_name, data_to_models):
     daten = load_data(file_name)
-    next(daten, None)  #  skip header
+    next(daten, None)  # skip header
     for data in daten:
         for model in data_to_models(data):
             model.save()
@@ -74,7 +90,7 @@ def build_generic(model_classes, file_name, data_to_models):
 
 def scrubStr(str):
     """
-    The purpose of this function is to scrub the weird template mark-up out of strings 
+    The purpose of this function is to scrub the weird template mark-up out of strings
     that Veekun is using for their pokedex.
     Example:
         []{move:dragon-tail} will effect the opponents [HP]{mechanic:hp}.
@@ -100,15 +116,16 @@ def scrubStr(str):
 
 def _build_languages():
     def data_to_language(info):
-        yield Language (
-            id = int(info[0]),
-            iso639 = info[1],
-            iso3166 = info[2],
-            name = info[3],
-            official = bool(int(info[4])),
-            order = info[5],
+        yield Language(
+            id=int(info[0]),
+            iso639=info[1],
+            iso3166=info[2],
+            name=info[3],
+            official=bool(int(info[4])),
+            order=info[5],
         )
     build_generic((Language,), 'languages.csv', data_to_language)
+
 
 def build_languages():
     _build_languages()
@@ -119,19 +136,18 @@ def build_languages():
     for index, info in enumerate(data):
         if index > 0:
 
-            languageName = LanguageName (
-                language = Language.objects.get(pk = int(info[0])),
-                local_language = Language.objects.get(pk = int(info[1])),
-                name = info[2]
+            languageName = LanguageName(
+                language=Language.objects.get(pk=int(info[0])),
+                local_language=Language.objects.get(pk=int(info[1])),
+                name=info[2]
             )
 
             languageName.save()
 
-
-
 ############
 #  REGION  #
 ############
+
 
 def build_regions():
     clear_table(Region)
@@ -140,12 +156,11 @@ def build_regions():
     for index, info in enumerate(data):
         if index > 0:
 
-            model = Region (
-                id = int(info[0]),
-                name = info[1]
+            model = Region(
+                id=int(info[0]),
+                name=info[1]
             )
             model.save()
-
 
     clear_table(RegionName)
     data = load_data('region_names.csv')
@@ -553,9 +568,9 @@ def build_growth_rates():
             model.save()
 
 
-###########
-#  ITEMS  #
-###########
+# ###########
+# #  ITEMS  #
+# ###########
 
 def build_items():
     clear_table(ItemPocket)
@@ -641,6 +656,7 @@ def build_items():
 
 
     clear_table(Item)
+    clear_table(ItemSprites)
     data = load_data('items.csv')
 
     for index, info in enumerate(data):
@@ -655,6 +671,28 @@ def build_items():
                 item_fling_effect = ItemFlingEffect.objects.get(pk = int(info[5])) if info[5] != '' else None
             )
             model.save()
+
+            if re.search(r"^data-card", info[1]):
+                fileName = 'data-card.png'
+            elif re.search(r"^tm[0-9]", info[1]):
+                fileName = 'tm-normal.png'
+            elif re.search(r"^hm[0-9]", info[1]):
+                fileName = 'hm-normal.png'
+            else:
+                fileName = '%s.png' % info[1]
+
+            itemSprites = 'items/{0}';
+
+            sprites = {
+                'default': filePathOrNone(itemSprites.format(fileName)),
+            }
+
+            imageModel = ItemSprites (
+                id = index,
+                item = Item.objects.get(pk=int(info[0])),
+                sprites = json.dumps(sprites)
+            )
+            imageModel.save()
 
 
     clear_table(ItemName)
@@ -1453,20 +1491,20 @@ def build_natures():
 
     for index, info in enumerate(data):
         if index > 0:
-  
+
             decreased_stat = None
             increased_stat = None
             hates_flavor = None
             likes_flavor = None
-    
+
             if (info[2] != info[3]):
                 decreased_stat = Stat.objects.get(pk = int(info[2]))
                 increased_stat = Stat.objects.get(pk = int(info[3]))
-    
+
             if (info[4] != info[5]):
                 hates_flavor = BerryFlavor.objects.get(pk = int(info[4]))
                 likes_flavor = BerryFlavor.objects.get(pk = int(info[5]))
-    
+
             nature = Nature (
                 id = int(info[0]),
                 name = info[1],
@@ -1484,7 +1522,7 @@ def build_natures():
 
     for index, info in enumerate(data):
         if index > 0:
-  
+
             natureName = NatureName (
                 nature = Nature.objects.get(pk = int(info[0])),
                 language = Language.objects.get(pk = int(info[1])),
@@ -1498,7 +1536,7 @@ def build_natures():
 
     for index, info in enumerate(data):
         if index > 0:
-  
+
             naturePokeathlonStat = NaturePokeathlonStat (
                 nature = Nature.objects.get(pk = int(info[0])),
                 pokeathlon_stat = PokeathlonStat.objects.get(pk = int(info[1])),
@@ -1512,7 +1550,7 @@ def build_natures():
 
     for index, info in enumerate(data):
         if index > 0:
-  
+
             model = NatureBattleStylePreference (
                 nature = Nature.objects.get(pk = int(info[0])),
                 move_battle_style = MoveBattleStyle.objects.get(pk = int(info[1])),
@@ -1694,7 +1732,7 @@ def build_locations():
 
     for index, info in enumerate(data):
         if index > 0:
-  
+
             model = Location (
                 id = int(info[0]),
                 region = Region.objects.get(pk = int(info[1])) if info[1] != '' else None,
@@ -1708,7 +1746,7 @@ def build_locations():
 
     for index, info in enumerate(data):
         if index > 0:
-  
+
             model = LocationName (
                 location = Location.objects.get(pk = int(info[0])),
                 language = Language.objects.get(pk = int(info[1])),
@@ -1722,7 +1760,7 @@ def build_locations():
 
     for index, info in enumerate(data):
         if index > 0:
-  
+
             model = LocationGameIndex (
                 location = Location.objects.get(pk = int(info[0])),
                 generation = Generation.objects.get(pk = int(info[1])),
@@ -1736,14 +1774,14 @@ def build_locations():
 
     for index, info in enumerate(data):
         if index > 0:
-  
+
             location = Location.objects.get(pk = int(info[1]))
-    
+
             model = LocationArea (
               id = int(info[0]),
               location = location,
               game_index = int(info[2]),
-              name = '{}-{}'.format(location.name, info[3]) if info[3] else '{}-{}'.format(location.name, 'area') 
+              name = '{}-{}'.format(location.name, info[3]) if info[3] else '{}-{}'.format(location.name, 'area')
             )
             model.save()
 
@@ -1762,12 +1800,13 @@ def build_locations():
         model.save()
 
 
-    
+
 #############
 #  POKEMON  #
 #############
 
 def build_pokemons():
+
     clear_table(PokemonColor)
     data = load_data('pokemon_colors.csv')
 
@@ -1921,6 +1960,7 @@ def build_pokemons():
 
 
     clear_table(Pokemon)
+    clear_table(PokemonSprites)
     data = load_data('pokemon.csv')
 
     for index, info in enumerate(data):
@@ -1938,6 +1978,26 @@ def build_pokemons():
             )
             model.save()
 
+            fileName = '%s.png' % info[0]
+            pokeSprites = 'pokemon/{0}';
+
+            sprites = {
+                'front_default'      : filePathOrNone(pokeSprites.format(fileName)),
+                'front_female'       : filePathOrNone(pokeSprites.format('female/'+fileName)),
+                'front_shiny'        : filePathOrNone(pokeSprites.format('shiny/'+fileName)),
+                'front_shiny_female' : filePathOrNone(pokeSprites.format('shiny/female/'+fileName)),
+                'back_default'       : filePathOrNone(pokeSprites.format('back/'+fileName)),
+                'back_female'        : filePathOrNone(pokeSprites.format('back/female/'+fileName)),
+                'back_shiny'         : filePathOrNone(pokeSprites.format('back/shiny/'+fileName)),
+                'back_shiny_female'  : filePathOrNone(pokeSprites.format('back/shiny/female/'+fileName)),
+            }
+
+            imageModel = PokemonSprites (
+                id = index,
+                pokemon = Pokemon.objects.get(pk=int(info[0])),
+                sprites = json.dumps(sprites)
+            )
+            imageModel.save()
 
     clear_table(PokemonAbility)
     data = load_data('pokemon_abilities.csv')
@@ -2013,16 +2073,19 @@ def build_pokemons():
 
 
     clear_table(PokemonForm)
+    clear_table(PokemonFormSprites)
     data = load_data('pokemon_forms.csv')
 
     for index, info in enumerate(data):
         if index > 0:
 
+            pokemon = Pokemon.objects.get(pk = int(info[3]))
+
             model = PokemonForm (
                 id = int(info[0]),
                 name = info[1],
                 form_name = info[2],
-                pokemon = Pokemon.objects.get(pk = int(info[3])),
+                pokemon = pokemon,
                 version_group = VersionGroup.objects.get(pk = int(info[4])),
                 is_default = bool(int(info[5])),
                 is_battle_only = bool(int(info[6])),
@@ -2031,6 +2094,30 @@ def build_pokemons():
                 order = int(info[9])
             )
             model.save()
+
+            if info[2]:
+                if re.search(r"^mega", info[2]):
+                    fileName = '%s.png' % info[3]
+                else:
+                    fileName = '%s-%s.png' % (getattr(pokemon, 'pokemon_species_id'), info[2])
+            else:
+                fileName = '%s.png' % getattr(pokemon, 'pokemon_species_id')
+
+            pokeSprites = 'pokemon/{0}'
+
+            sprites = {
+                'front_default'      : filePathOrNone(pokeSprites.format(fileName)),
+                'front_shiny'        : filePathOrNone(pokeSprites.format('shiny/'+fileName)),
+                'back_default'       : filePathOrNone(pokeSprites.format('back/'+fileName)),
+                'back_shiny'         : filePathOrNone(pokeSprites.format('back/shiny/'+fileName)),
+            }
+
+            imageModel = PokemonFormSprites (
+                id = index,
+                pokemon_form = PokemonForm.objects.get(pk=int(info[0])),
+                sprites = json.dumps(sprites)
+            )
+            imageModel.save()
 
 
     clear_table(PokemonFormName)

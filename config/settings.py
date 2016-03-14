@@ -4,7 +4,8 @@ import os
 
 PROJECT_ROOT = Path(__file__).ancestor(2)
 
-DEBUG = True
+DEBUG = False
+
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -84,7 +85,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 TEMPLATE_DIRS = (
     PROJECT_ROOT.child('templates'),
-    # PROJECT_ROOT + 'pokemon/templates'
 )
 
 DATABASES = {
@@ -145,18 +145,18 @@ CORS_ALLOW_METHODS = (
 )
 
 REST_FRAMEWORK = {
-
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     ),
-
-   'DEFAULT_PARSER_CLASSES': (
-        'rest_framework.parsers.JSONParser', 
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
     ),
 
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
 
     'PAGE_SIZE': 20,
+
+    'PAGINATE_BY': 20,
 }
 
 MARKDOWN_DEUX_STYLES = {

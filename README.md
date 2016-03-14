@@ -13,7 +13,7 @@ http://pokeapi.co
 
 Quite a lot of data is missing from the V1 API.
 
-**As of January 2015, no new data will be added to the v1 API, you will have to use the V2 API instead. This is part of an ongoing deprecation of the v1 API.**
+**As of January 2015, no new data will be added to the v1 API, you will have to use the V2 API instead.**
 
 See [This blog post for more information](http://phalt.co/if-you-have-data-they-will-consume-it).
 
@@ -109,6 +109,20 @@ Heres a list of the data building functions
 - build_encounters()
 - build_pal_parks()
 
+
+## Docker
+
+The application can be built and run as a Docker container for easy deployments
+
+From the root directory of the cloned repo
+```
+docker build -t pokeapi .
+```
+
+Run the container on host port 8000
+```
+docker run -d -p 8000:8000 pokeapi
+```
 
 ## Contributing
 
