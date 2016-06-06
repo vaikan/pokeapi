@@ -51,10 +51,10 @@
         <p>Finally; all the Pokémon data you'll ever need, in one place,<br /> and easily accessible through a modern RESTful API.</p>
         <p>Whats new in V2? Check out the <a href="/docsv2/">docs</a>!</p>
     </div>
-        
-    
+
+
     <div class="container">
-        
+
 
         <div class="row">
 
@@ -89,14 +89,14 @@
             "slot": 3,
             "ability": {
                 "name": "chlorophyll",
-                "url": "http://localhost:8000/api/v2/ability/34/"
+                "url": "http://pokeapi.co/api/v2/ability/34/"
             }
         }
     ],
     "forms": [
         {
             "name": "bulbasaur",
-            "url": "http://localhost:8000/api/v2/pokemon-form/1/"
+            "url": "http://pokeapi.co/api/v2/pokemon-form/1/"
         }
     ],
     "game_indices": [
@@ -104,7 +104,7 @@
             "game_index": 1,
             "version": {
                 "name": "white-2",
-                "url": "http://localhost:8000/api/v2/version/22/"
+                "url": "http://pokeapi.co/api/v2/version/22/"
             }
         }
     ],
@@ -114,40 +114,40 @@
         {
             "move": {
                 "name": "captivate",
-                "url": "http://localhost:8000/api/v2/move/445/"
+                "url": "http://pokeapi.co/api/v2/move/445/"
             },
             "version_group_details": [
                 {
                     "level_learned_at": 0,
                     "version_group": {
                         "name": "heartgold-soulsilver",
-                        "url": "http://localhost:8000/api/v2/version-group/10/"
+                        "url": "http://pokeapi.co/api/v2/version-group/10/"
                     },
                     "move_learn_method": {
                         "name": "machine",
-                        "url": "http://localhost:8000/api/v2/move-learn-method/4/"
+                        "url": "http://pokeapi.co/api/v2/move-learn-method/4/"
                     }
                 },
                 {
                     "level_learned_at": 0,
                     "version_group": {
                         "name": "platinum",
-                        "url": "http://localhost:8000/api/v2/version-group/9/"
+                        "url": "http://pokeapi.co/api/v2/version-group/9/"
                     },
                     "move_learn_method": {
                         "name": "machine",
-                        "url": "http://localhost:8000/api/v2/move-learn-method/4/"
+                        "url": "http://pokeapi.co/api/v2/move-learn-method/4/"
                     }
                 },
                 {
                     "level_learned_at": 0,
                     "version_group": {
                         "name": "diamond-pearl",
-                        "url": "http://localhost:8000/api/v2/version-group/8/"
+                        "url": "http://pokeapi.co/api/v2/version-group/8/"
                     },
                     "move_learn_method": {
                         "name": "machine",
-                        "url": "http://localhost:8000/api/v2/move-learn-method/4/"
+                        "url": "http://pokeapi.co/api/v2/move-learn-method/4/"
                     }
                 }
             ]
@@ -155,7 +155,7 @@
     ],
     "species": {
         "name": "bulbasaur",
-        "url": "http://localhost:8000/api/v2/pokemon-species/1/"
+        "url": "http://pokeapi.co/api/v2/pokemon-species/1/"
     },
     "stats": [
         {
@@ -163,7 +163,7 @@
             "effort": 0,
             "stat": {
                 "name": "speed",
-                "url": "http://localhost:8000/api/v2/stat/6/"
+                "url": "http://pokeapi.co/api/v2/stat/6/"
             }
         }
     ],
@@ -172,7 +172,7 @@
             "slot": 2,
             "type": {
                 "name": "poison",
-                "url": "http://localhost:8000/api/v2/type/4/"
+                "url": "http://pokeapi.co/api/v2/type/4/"
             }
         }
     ]
@@ -187,9 +187,9 @@
         <div class="row">
 
             <div class="col-md-10 center-block">
-                
+
                 <div class="row">
-                    
+
                     <div class="col-md-4">
                         <p class="lead center">
                             What is this?
@@ -223,12 +223,23 @@
 
                     <div class="col-md-4">
                         <p class="lead center">
-                            I want to help.
+                            Keep PokéAPI Running
                         </p>
                         <div class="well">
-                            <p>Amazing!</p>
-                            <p>Head over to <a href="https://github.com/phalt/pokeapi">GitHub</a> and read some of the issues and feature requests. If you can contribute then go ahead and start making pull requests :)</p>
-                        </div>
+                            <p>PokéAPI costs around $50 a month to run. We want to keep this free and scalable for as long as possible!
+                            </p>
+                            <p><b>If you use PokéAPI for teaching or for building apps, consider donating today!</b></p>
+                            <form action="/stripe/donation" method="POST">
+                              <script
+                                src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                                data-key="{{stripe_key}}"
+                                data-image="http://i.imgur.com/Jya9cm0.png"
+                                data-name="pokeapi.co"
+                                data-description="Donate and keep pokeapi alive!"
+                                data-amount="1000"
+                                data-panel-label="Donate">
+                              </script>
+                            </form></p></div>
                     </div>
                 </div>
             </div>

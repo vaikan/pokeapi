@@ -95,17 +95,17 @@ DATABASES = {
         'PASSWORD': 'pokeapi',
         'HOST': 'localhost',
         'PORT': '',
+        'CONN_MAX_AGE': 30
     }
 }
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'TIMEOUT': 30
-    },
-    'resources': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'TIMEOUT': 360
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
 }
 
@@ -130,7 +130,8 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'corsheaders',
     'rest_framework',
-    'markdown_deux'
+    'markdown_deux',
+    'cachalot'
 ) + CUSTOM_APPS
 
 
@@ -144,12 +145,14 @@ CORS_ALLOW_METHODS = (
     'GET'
 )
 
+CORS_URLS_REGEX = r'^/api/.*$'
+
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
+        'drf_ujson.renderers.UJSONRenderer',
     ),
     'DEFAULT_PARSER_CLASSES': (
-        'rest_framework.parsers.JSONParser',
+        'drf_ujson.renderers.UJSONRenderer',
     ),
 
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
@@ -170,3 +173,21 @@ MARKDOWN_DEUX_STYLES = {
         "safe_mode": False,
     },
 }
+
+# Stripe
+
+STRIPE_TEST_SECRET_KEY = os.environ.get('STRIPE_TEST_SECRET_KEY', '')
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', '')
+STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', '')
+STRIPE_TEST_PUBLISHABLE_KEY = os.environ.get('STRIPE_TEST_PUBLISHABLE_KEY', '')
+
+if DEBUG:
+    STRIPE_KEYS = {
+        "secret": STRIPE_TEST_SECRET_KEY,
+        "publishable": STRIPE_TEST_PUBLISHABLE_KEY
+    }
+else:
+    STRIPE_KEYS = {
+        "secret": STRIPE_SECRET_KEY,
+        "publishable": STRIPE_PUBLISHABLE_KEY
+    }

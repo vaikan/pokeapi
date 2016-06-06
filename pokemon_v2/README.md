@@ -92,7 +92,7 @@ Calling any api endpoint without a resource id or name will return a paginated l
 
 | Name | Description | Data Type |
 | ---- | ----------- | --------- |
-| count    | The total number of resources abailable from this api | integer |
+| count    | The total number of resources available from this api | integer |
 | next     | The url for the next 'page' in the list               | string  |
 | previous | The url for the previous page in the list             | boolean |
 | results  | The list of non-named api resources                     | list [APIResource](#apiresource) |
@@ -116,7 +116,7 @@ Calling any api endpoint without a resource id or name will return a paginated l
 
 | Name | Description | Data Type |
 | ---- | ----------- | --------- |
-| count    | The total number of resources abailable from this api | integer |
+| count    | The total number of resources available from this api | integer |
 | next     | The url for the next 'page' in the list               | string  |
 | previous | The url for the previous page in the list             | boolean |
 | results  | The list of named api resources                    	   | list [NamedAPIResource](#namedapiresource) |
@@ -980,10 +980,22 @@ An item is an object in the games which the player can pick up, keep in their ba
 | flavor_text_entries | The flavor text of this ability listed in different languages        | list [VersionGroupFlavorText](#versiongroupflavortext) |
 | game_indices        | A list of game indices relevent to this item by generation           | list [GenerationGameIndex](#generationgameindex) |
 | names               | The name of this item listed in different languages                  | list [Name](#resourcename) |
-| held_by_pokemon     | A list of pokémon that might be found in the wild holding this item  | list [NamedAPIResource](#namedapiresource) ([Pokemon](#pokemon)) |
+| held_by_pokemon     | A list of pokémon that might be found in the wild holding this item  | list [HeldByPokemon](#heldbypokemon) |
 | baby_trigger_for    | An evolution chain this item requires to produce a bay during mating | list [APIResource](#apiresource) ([EvolutionChain](#evolution-chains)) |
 
+#### HeldByPokemon
 
+| Name | Description | Data Type |
+| ---- | ----------- | --------- |
+| pokemon | The pokemon who might be holding the item | [NamedAPIResource](#namedapiresource) ([Pokemon](#pokemon)) |
+| version_details | Details on chance of the pokemon having the item based on version | list [VersionDetails](#helditemversiondetails) |
+
+#### HeldItemVersionDetails
+
+| Name | Description | Data Type |
+| ---- | ----------- | --------- |
+| rarity | The chance of the pokemon holding the item | integer |
+| version | The version the rarity applies | [NamedAPIResource](#namedapiresource) ([Version](#version)) |
 ## Item Attributes
 Item attributes define particular aspects of items, e.g. "usable in battle" or "consumable".
 
@@ -1273,7 +1285,7 @@ Moves are the skills of pokémon in battle.  In battle, a Pokémon uses one move
 | names          | The name of this move listed in different languages                                                                                                                       | list [Name](#resourcename) |
 | past_values    | A list of move resource value changes across ersion groups of the game                                                                                                    | list [PastMoveStatValues](#pastmovestatvalues) |
 | stat_changes   | A list of stats this moves effects and how much it effects them                                                                                                           | list [MoveStatChange](#movestatchange) |
-| contest_effect | The effect the move has when used in a super contest                                                                                                                      | [NamedAPIResource](#namedapiresource) ([ContestEffect](#contest-effects)) |
+| super_contest_effect | The effect the move has when used in a super contest                                                                                                                      | [NamedAPIResource](#namedapiresource) ([ContestEffect](#contest-effects)) |
 | target         | The type of target that will recieve the effects of the attack                                                                                                            | [NamedAPIResource](#namedapiresource) ([MoveTarget](#move-targets)) |
 | type           | The elemental type of this move                                                                                                                                           | [NamedAPIResource](#namedapiresource) ([Type](#types)) |
 
@@ -1568,7 +1580,7 @@ Targets moves can be directed at during battle. Targets can be pokémon, environ
 ## Locations
 Locations that can be visited within the games. Locations make up sizable portions of regions, like cities or routes.
 
-### GET api/v2/location/{id or name}
+### GET api/v2/location/{id}
 
 ###### example response
 
@@ -1618,7 +1630,7 @@ Locations that can be visited within the games. Locations make up sizable portio
 ## Location Areas
 Location areas are sections of areas, such as floors in a building or cave. Each area has its own set of possible pokemon encounters.
 
-### GET api/v2/location-area/{id or name}
+### GET api/v2/location-area/{id}
 
 ###### example response
 
