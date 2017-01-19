@@ -118,6 +118,7 @@ CUSTOM_APPS = (
     'pokemon',
     'pokemon_v2',
     'hits',
+    'alerts',
 )
 
 INSTALLED_APPS = (
@@ -160,6 +161,12 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
 
     'PAGINATE_BY': 20,
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.AnonRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '1000/hour'
+    }
 }
 
 MARKDOWN_DEUX_STYLES = {

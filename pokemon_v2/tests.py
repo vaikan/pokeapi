@@ -5,7 +5,7 @@ from pokemon_v2.models import *  # NOQA
 import json
 
 test_host = 'http://testserver'
-media_sprites = '/media/sprites/{}'
+media_host = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/'
 api_v2 = '/api/v2'
 
 
@@ -1113,6 +1113,24 @@ class APIData():
         super_contest_combo.save()
 
         return super_contest_combo
+
+    @classmethod
+    def setup_move_flavor_text_data(self, move, flavor_text='move flvr txt'):
+        version_group = self.setup_version_group_data(
+            name='ver grp for '+flavor_text)
+
+        language = self.setup_language_data(
+            name='lang for '+flavor_text)
+
+        move_flavor_text = MoveFlavorText.objects.create(
+            move=move,
+            version_group=version_group,
+            language=language,
+            flavor_text=flavor_text
+        )
+        move_flavor_text.save()
+
+        return move_flavor_text
 
     @classmethod
     def setup_move_data(self, contest_type=None, contest_effect=None, super_contest_effect=None,
@@ -2698,7 +2716,7 @@ class APITests(APIData, APITestCase):
         # sprites
         self.assertEqual(
             response.data['sprites']['default'],
-            '{}{}'.format(test_host, sprites_data['default']))
+            '{}{}'.format(media_host, sprites_data['default'].replace('/media/', '')))
 
     # Berry Tests
     def test_berry_firmness_api(self):
@@ -3488,6 +3506,7 @@ class APITests(APIData, APITestCase):
         self.setup_contest_combo_data(before_move, move)
         self.setup_super_contest_combo_data(move, after_move)
         self.setup_super_contest_combo_data(before_move, move)
+        move_flavor_text = self.setup_move_flavor_text_data(move, flavor_text='flvr text for move')
 
         response = self.client.get('{}/move/{}/'.format(api_v2, move.pk))
 
@@ -3631,6 +3650,21 @@ class APITests(APIData, APITestCase):
             response.data['effect_changes'][0]['effect_entries'][0]['language']['url'],
             '{}{}/language/{}/'.format(
                 test_host, api_v2, move_effect_change_effect_text.language.pk))
+        # flavor text params
+        self.assertEqual(
+            response.data['flavor_text_entries'][0]['flavor_text'], move_flavor_text.flavor_text)
+        self.assertEqual(
+            response.data['flavor_text_entries'][0]['language']['name'],
+            move_flavor_text.language.name)
+        self.assertEqual(
+            response.data['flavor_text_entries'][0]['language']['url'],
+            '{}{}/language/{}/'.format(test_host, api_v2, move_flavor_text.language.pk))
+        self.assertEqual(
+            response.data['flavor_text_entries'][0]['version_group']['name'],
+            move_flavor_text.version_group.name)
+        self.assertEqual(
+            response.data['flavor_text_entries'][0]['version_group']['url'],
+            '{}{}/version-group/{}/'.format(test_host, api_v2, move_flavor_text.version_group.pk))
 
     # Stat Tests
     def test_stat_api(self):
@@ -4219,7 +4253,7 @@ class APITests(APIData, APITestCase):
         # sprite params
         self.assertEqual(
             response.data['sprites']['front_default'],
-            '{}{}'.format(test_host, sprites_data['front_default']))
+            '{}{}'.format(media_host, sprites_data['front_default'].replace('/media/', '')))
         self.assertEqual(response.data['sprites']['back_default'], None)
 
     def test_pokemon_form_api(self):
@@ -4258,7 +4292,7 @@ class APITests(APIData, APITestCase):
         # sprite params
         self.assertEqual(
             response.data['sprites']['front_default'],
-            '{}{}'.format(test_host, sprites_data['front_default']))
+            '{}{}'.format(media_host, sprites_data['front_default'].replace('/media/', '')))
         self.assertEqual(response.data['sprites']['back_default'], None)
 
     # Evolution test

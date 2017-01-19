@@ -33,19 +33,19 @@
         <h4>Over <span class="count">{{ total_views|intcomma }}</span> API calls received!</h4>
     </div>
 
+    {% if alert %}
     <div class="container">
-        {% if update %}
-        <div class="row" style="padding-top:80px;text-align:center;">
+        <div class="row" style="padding-top:20px;text-align:center;">
             <div class="col-md-2">
             </div>
             <div class="col-md-8">
-            <div class="alert alert-success">{{update.content|safe}}</div>
+            <div class="alert alert-danger" role="alert">{{ alert.message|safe }}</div>
             </div>
             <div class="col-md-2">
             </div>
-        </div><!-- /.header row -->
-        {% endif %}
+        </div>
     </div>
+    {% endif %}
 
     <div class="cta">
         <p>Finally; all the Pokémon data you'll ever need, in one place,<br /> and easily accessible through a modern RESTful API.</p>
@@ -183,6 +183,11 @@
 
         </div><!--interactive row-->
 
+        <div class="row">
+            <div class="col-md-10 center-block center pad_top pad_bot">
+                <a href="https://www.digitalocean.com/?refcode=eab2fea41bc6" target="none"><img class="do_image" src="/static/do-logo.png"></a>
+        </div>
+
 
         <div class="row">
 
@@ -200,7 +205,7 @@
                                 detailing everything about the Pokémon main game series.
                             </p>
                             <p>
-                                We've covered everything from Pokémon, Berry Flavors.
+                                We've covered everything from Pokémon to Berry Flavors.
                             </p>
                         </div>
                     </div>
@@ -233,7 +238,7 @@
                               <script
                                 src="https://checkout.stripe.com/checkout.js" class="stripe-button"
                                 data-key="{{stripe_key}}"
-                                data-image="http://i.imgur.com/Jya9cm0.png"
+                                data-image="https://i.imgur.com/Jya9cm0.png"
                                 data-name="pokeapi.co"
                                 data-description="Donate and keep pokeapi alive!"
                                 data-amount="1000"

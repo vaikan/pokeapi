@@ -1,12 +1,16 @@
 # PokeAPI
 
+A RESTful API for Pokémon
 
-A RESTful API for Pokemon
-
-
-LICENSE: BSD
+LICENSE: [BSD](https://github.com/PokeAPI/pokeapi/blob/master/LICENSE.rst)
 
 http://pokeapi.co
+
+[![ghit.me](https://ghit.me/badge.svg?repo=PokeAPI/pokeapi)](https://ghit.me/repo/PokeAPI/pokeapi)
+
+## Fair use policy
+
+PokéAPI is open and free to use. However, we will ban IP addresses that abuse this privilege. This API is used primarily for educational purposes, and we do not want people inhibiting the education of others. See the fair use guide on the docs for more information.
 
 ## Join Us On Slack!
 Have a question or just want to discuss new ideas and improvements? Hit us up on slack. Consider talking with us here before creating new issue.
@@ -14,7 +18,7 @@ This way we can keep issues here a bit more organized and helpful in the long ru
 
 [Sign up easily](https://pokeapi-slack-invite.herokuapp.com/)!
 
-Qnce you've signed up visit [PokeAPI on Slack](https://pokeapi.slack.com)
+Once you've signed up visit [PokeAPI on Slack](https://pokeapi.slack.com)
 
 ## Donations
 
@@ -31,7 +35,7 @@ Quite a lot of data is missing from the V1 API.
 
 See [This blog post for more information](http://phalt.co/if-you-have-data-they-will-consume-it).
 
-## Setup
+## Setup [![pyVersion27](https://img.shields.io/badge/python-2.7-blue.svg)](https://www.python.org/download/releases/2.7/) 
 
 - Download this source code into a working directory.
 
@@ -137,6 +141,42 @@ Run the container on host port 8000
 ```
 docker run -d -p 8000:8000 pokeapi
 ```
+
+
+## Docker Compose
+
+There is also a multi-container setup, managed by [Docker Compose](https://docs.docker.com/compose/). This setup allow you to deploy a production-like environment, with separate containers for each services.
+
+Create data volumes for Redis and Postgres
+```
+docker volume create --name=redis_data
+docker volume create --name=pg_data
+```
+
+Start the process using
+```
+docker-compose up
+```
+You can specify the ```-d``` switch to start in detached mode.   
+This will bind port 80 and 443. Unfortunately, unlike the ```docker``` command, there is no command line arguments to specify ports. If you want to change them, edit the ```docker-compose.yml``` file.
+
+After that, start the migration process
+```
+docker-compose exec app python manage.py migrate
+```
+
+And then, import the data using the shell
+```
+docker-compose exec app python manage.py shell
+```
+
+You can use the ```build_all()``` method, or individuals data building functions (See _V2 Database setup_)
+```
+from data.v2.build import build_all
+build_all()
+```
+
+For the moment, this setup doesn't allow you to use the ```scale``` command.
 
 ## Contributing
 
