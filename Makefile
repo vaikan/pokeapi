@@ -5,11 +5,10 @@ dev-install:
 	pip install -r test-requirements.txt
 
 lint:
-	flake8 .
+	pylint config data pokemon_v2 --load-plugins pylint_django
 
 setup:
 	python manage.py migrate --settings=config.local
-	python manage.py loaddata dev-data.json --settings=config.local
 
 wipe_db:
 	rm -rf db.sqlite3
@@ -25,3 +24,6 @@ clean:
 
 migrate:
 	python manage.py migrate --settings=config.local
+
+shell:
+	python manage.py shell --settings=config.local
